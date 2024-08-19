@@ -1,10 +1,36 @@
+require("dotenv").config();
 const express = require("express");
 const app = express();
+const Note = require("./models/note");
 const cors = require("cors");
 
 app.use(cors());
 
 app.use(express.json());
+
+const mongoose = require("mongoose");
+
+const password = process.argv[2];
+
+const url = process.env.MONGODB_URI;
+
+mongoose.set("strictQuery", false);
+mongoose.connect(url);
+
+const noteSchema = new mongoose.Schema({
+  content: String,
+  important: Boolean,
+});
+
+noteSchema.set("toJSON", {
+  transform: (document, returnedObject) => {
+    returnedObject.id = returnedObject._id.toString();
+    delete returnedObject._id;
+    delete returnedObject.__v;
+  },
+});
+
+const Note = mongoose.model("Note", noteSchema);
 
 let notes = [
   {
@@ -29,9 +55,10 @@ app.get("/", (request, response) => {
 });
 
 app.get("/api/notes", (request, response) => {
-  response.json(notes);
+  Note.find({}).then((notes) => {
+    response.json(notes);
+  });
 });
-
 app.get("/api/notes/:id", (request, response) => {
   const id = request.params.id;
   const note = notes.find((note) => note.id === id);
