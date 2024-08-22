@@ -9,3 +9,17 @@ Content-Type: application/json
 ###
 
 GET http://localhost:3001/api/notes
+
+###
+
+GET http://localhost:3001/api/notes/someInvalidId
+
+###
+
+PUT http://localhost:3001/api/notes/66c3c58adfe68532cc978092
+Content-Type: application/json
+
+{
+    "content": "This was not the original content, it was edited.",
+    "important": true
+}
